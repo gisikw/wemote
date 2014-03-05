@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'wemote/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "remo"
+  spec.name          = "wemote"
   spec.version       = Wemote::VERSION
   spec.authors       = ["Kevin Gisi"]
   spec.email         = ["kevin@kevingisi.com"]
