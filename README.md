@@ -4,17 +4,17 @@ Remo is an interface for controlling WeMo light switches (and possibly outlets i
 
 ## Installation
 
-Add this line to your application's Gemfile:
+First, clone the repository:
 
-    gem 'remo'
+    git clone https://github.com/gisikw/remo.git
 
 And then execute:
 
-    $ bundle
+    $ gem build remo.gemspec
 
-Or install it yourself as:
+Finally, run:
 
-    $ gem install remo
+    $ gem install remo-0.0.1.gem
 
 ## Usage
 
