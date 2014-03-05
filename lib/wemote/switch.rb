@@ -2,7 +2,7 @@ require 'socket'
 require 'ipaddr'
 require 'manticore'
 
-module Remo
+module Wemote
   class Switch
     MULTICAST_ADDR = '239.255.255.250'
     BIND_ADDR = '0.0.0.0'
@@ -81,17 +81,17 @@ EOF
 
     def off!
       begin
-        Manticore.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Remo::XML.set_binary_state(0), :headers => SET_HEADERS).call
+        Manticore.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Wemote::XML.set_binary_state(0), :headers => SET_HEADERS).call
       rescue Exception
-        Manticore.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Remo::XML.set_binary_state(0), :headers => SET_HEADERS).call
+        Manticore.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Wemote::XML.set_binary_state(0), :headers => SET_HEADERS).call
       end
     end
 
     def on!
       begin
-        Manticore.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Remo::XML.set_binary_state(1), :headers => SET_HEADERS).call
+        Manticore.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Wemote::XML.set_binary_state(1), :headers => SET_HEADERS).call
       rescue Exception
-        Manticore.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Remo::XML.set_binary_state(1), :headers => SET_HEADERS).call
+        Manticore.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Wemote::XML.set_binary_state(1), :headers => SET_HEADERS).call
       end
     end
 
@@ -109,9 +109,9 @@ EOF
 
     def state
       response = begin
-        Manticore.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Remo::XML.get_binary_state, :headers => GET_HEADERS).call
+        Manticore.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Wemote::XML.get_binary_state, :headers => GET_HEADERS).call
       rescue Exception
-        Manticore.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Remo::XML.get_binary_state, :headers => GET_HEADERS).call
+        Manticore.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Wemote::XML.get_binary_state, :headers => GET_HEADERS).call
       end
       response.body.match(/<BinaryState>(\d)<\/BinaryState>/)[1] == '1' ? 'on' : 'off'
     end

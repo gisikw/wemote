@@ -1,16 +1,16 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'remo/version'
+require 'wemote/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "remo"
   spec.version       = Remo::VERSION
   spec.authors       = ["Kevin Gisi"]
   spec.email         = ["kevin@kevingisi.com"]
-  spec.description   = %q{Remo is a JRuby-friendly API for Wemo light switches}
-  spec.summary       = %q{Remo is a JRuby-friendly API for Wemo light switches}
-  spec.homepage      = "https://github.com/gisikw/remo"
+  spec.description   = %q{Wemote is a JRuby-friendly API for Wemo light switches}
+  spec.summary       = %q{Wemote is a JRuby-friendly API for Wemo light switches}
+  spec.homepage      = "https://github.com/gisikw/wemote"
   spec.license       = "MIT"
   spec.platform      = 'ruby'
 

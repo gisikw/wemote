@@ -1,4 +1,4 @@
-module Remo
+module Wemote
   module XML
     class << self
       TEMPLATES = {}
