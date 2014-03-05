@@ -5,7 +5,7 @@ require 'wemote/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "remo"
-  spec.version       = Remo::VERSION
+  spec.version       = Wemote::VERSION
   spec.authors       = ["Kevin Gisi"]
   spec.email         = ["kevin@kevingisi.com"]
   spec.description   = %q{Wemote is a JRuby-friendly API for Wemo light switches}
