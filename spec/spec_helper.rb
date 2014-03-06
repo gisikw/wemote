@@ -1,4 +1,4 @@
-require 'wemote'
 require 'coveralls'
-
 Coveralls.wear!
+
+require 'wemote'
