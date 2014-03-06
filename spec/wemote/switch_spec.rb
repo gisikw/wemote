@@ -10,7 +10,7 @@ describe Wemote::Switch do
     describe '.find' do
       it 'should return an instance whose name matches the argument' do
         client = Manticore::Client.new
-        client.mstub('http://fakehost:1234/setup.xml',body:'<friendlyName>Test Switch</friendlyName>',code:200)
+        client.stub('http://fakehost:1234/setup.xml',body:'<friendlyName>Test Switch</friendlyName>',code:200)
         Wemote::Switch.any_instance.stub(:client).and_return(client)
         switch = Wemote::Switch.new('fakehost','1234')
         Wemote::Switch.instance_variable_set(:@switches,[switch])
@@ -23,7 +23,7 @@ describe Wemote::Switch do
   describe 'instance methods' do
     before do
       client = Manticore::Client.new
-      client.mstub('http://fakehost:1234/setup.xml',body:'<friendlyName>Test Switch</friendlyName>',code:200)
+      client.stub('http://fakehost:1234/setup.xml',body:'<friendlyName>Test Switch</friendlyName>',code:200)
       Wemote::Switch.any_instance.stub(:client).and_return(client)
       @switch = Wemote::Switch.new('fakehost','1234')
     end
@@ -74,16 +74,16 @@ describe Wemote::Switch do
 
     describe 'get_state' do
       it 'should return the binary state of the switch' do
-        @switch.client.mstub('http://fakehost:1234/upnp/control/basicevent1',body:'<BinaryState>1</BinaryState>',code:200)
+        @switch.client.stub('http://fakehost:1234/upnp/control/basicevent1',body:'<BinaryState>1</BinaryState>',code:200)
         @switch.get_state.should == :on
-        @switch.client.mstub('http://fakehost:1234/upnp/control/basicevent1',body:'<BinaryState>0</BinaryState>',code:200)
+        @switch.client.stub('http://fakehost:1234/upnp/control/basicevent1',body:'<BinaryState>0</BinaryState>',code:200)
         @switch.get_state.should == :off
       end
     end
 
     describe 'set_state' do
       it 'should set the binary state of the switch' do
-        @switch.client.mstub('http://fakehost:1234/upnp/control/basicevent1',body:'Called',code:200)
+        @switch.client.stub('http://fakehost:1234/upnp/control/basicevent1',body:'Called',code:200)
         @switch.set_state(1).body.should == 'Called'
       end
     end
