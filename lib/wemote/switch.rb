@@ -79,48 +79,39 @@ EOF
       set_meta
     end
 
-    def off!
-      begin
-        Manticore.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Wemote::XML.set_binary_state(0), :headers => SET_HEADERS).call
-      rescue Exception
-        Manticore.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Wemote::XML.set_binary_state(0), :headers => SET_HEADERS).call
-      end
-    end
+    def toggle!;  on? ? off! : on!;   end
+    def off!;     set_state(0);       end
+    def off?;     get_state == :off;  end
+    def on!;      set_state(1);       end
+    def on?;      get_state == :on;   end
 
-    def on!
-      begin
-        Manticore.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Wemote::XML.set_binary_state(1), :headers => SET_HEADERS).call
-      rescue Exception
-        Manticore.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Wemote::XML.set_binary_state(1), :headers => SET_HEADERS).call
-      end
-    end
-
-    def toggle!
-      on? ? off! : on!
-    end
-
-    def on?
-      state == 'on'
-    end
-
-    def off?
-      state == 'off'
-    end
-
-    def state
+    def get_state
       response = begin
-        Manticore.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Wemote::XML.get_binary_state, :headers => GET_HEADERS).call
+        client.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Wemote::XML.get_binary_state, :headers => GET_HEADERS).call
       rescue Exception
-        Manticore.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Wemote::XML.get_binary_state, :headers => GET_HEADERS).call
+        client.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Wemote::XML.get_binary_state, :headers => GET_HEADERS).call
       end
-      response.body.match(/<BinaryState>(\d)<\/BinaryState>/)[1] == '1' ? 'on' : 'off'
+      response.body.match(/<BinaryState>(\d)<\/BinaryState>/)[1] == '1' ? :on : :off
+    end
+
+    def set_state(state)
+      begin
+        client.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Wemote::XML.set_binary_state(state), :headers => SET_HEADERS).call
+      rescue Exception
+        client.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Wemote::XML.set_binary_state(state), :headers => SET_HEADERS).call
+      end
     end
 
     private
 
+    def client
+      @client ||= Manticore::Client.new
+    end
+
     def set_meta
-      response = Manticore.get("http://#{@host}:#{@port}/setup.xml")
-      @name = response.body.match(/<friendlyName>([^<]+)<\/friendlyName>/)[1]
+      client.get("http://#{@host}:#{@port}/setup.xml") do |response|
+        @name = response.body.match(/<friendlyName>([^<]+)<\/friendlyName>/)[1]
+      end
     end
 
   end
