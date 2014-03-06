@@ -18,12 +18,12 @@ module Wemote
     module Manticore
       DEPENDENCIES = ['manticore']
 
-      def get(url,body=nil,headers=nil)
-        ::Manticore.get(url,{body:body,headers:headers}).call
+      def get(*args)
+        _get(::Manticore,*args).call
       end
 
-      def post(url,body=nil,headers=nil)
-        ::Manticore.post(url,{body:body,headers:headers}).call
+      def post(*args)
+        _post(::Manticore,*args).call
       end
 
     end
@@ -31,12 +31,12 @@ module Wemote
     module Typhoeus
       DEPENDENCIES = ['typhoeus']
 
-      def get(url,body=nil,headers=nil)
-        ::Typhoeus.get(url,{body:body,headers:headers})
+      def get(*args)
+        _get(::Typhoeus,*args)
       end
 
-      def post(url,body=nil,headers=nil)
-        ::Typhoeus.post(url,{body:body,headers:headers})
+      def post(*args)
+        _post(::Typhoeus,*args)
       end
 
     end
@@ -44,12 +44,12 @@ module Wemote
     module HTTParty
       DEPENDENCIES = ['httparty']
 
-      def get(url,body=nil,headers=nil)
-        ::HTTParty.get(url,{body:body,headers:headers})
+      def get(*args)
+        _get(::HTTParty,*args)
       end
 
-      def post(url,body=nil,headers=nil)
-        ::HTTParty.post(url,{body:body,headers:headers})
+      def post(*args)
+        _post(::HTTParty,*args)
       end
     end
 
@@ -76,6 +76,14 @@ module Wemote
 
     def initialize
       extend Wemote::Client.technique
+    end
+
+    def _get(lib,url,body=nil,headers=nil)
+      lib.get(url,{body:body,headers:headers})
+    end
+
+    def _post(lib,url,body=nil,headers=nil)
+      lib.post(url,{body:body,headers:headers})
     end
 
   end
