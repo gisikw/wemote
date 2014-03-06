@@ -37,15 +37,17 @@ EOF
 
       private
 
-      def fetch_switches
+      def ssdp_socket
         socket = UDPSocket.new
-        membership = IPAddr.new(MULTICAST_ADDR).hton + IPAddr.new(BIND_ADDR).hton
-
-        socket.setsockopt(Socket::IPPROTO_IP, Socket::IP_ADD_MEMBERSHIP, membership)
+        socket.setsockopt(Socket::IPPROTO_IP, Socket::IP_ADD_MEMBERSHIP, IPAddr.new(MULTICAST_ADDR).hton + IPAddr.new(BIND_ADDR).hton)
         socket.setsockopt(Socket::IPPROTO_IP, Socket::IP_MULTICAST_TTL, 1)
         socket.setsockopt(Socket::SOL_SOCKET, Socket::SO_REUSEPORT, 1)
         socket.bind(BIND_ADDR,PORT)
+        socket
+      end
 
+      def fetch_switches
+        socket = ssdp_socket
         switches = []
 
         3.times { socket.send(DISCOVERY, 0, MULTICAST_ADDR, PORT) }
