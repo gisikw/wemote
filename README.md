@@ -1,4 +1,4 @@
-# Wemote
+# Wemote [![Build Status](https://img.shields.io/travis/gisikw/wemote/master.svg)](https://travis-ci.org/gisikw/wemote)
 
 Wemote is an interface for controlling WeMo light switches (and possibly outlets in the future). Unlike other implementations, it does not rely upon `playful` for upnp discovery, which makes it compatible with JRuby. For the moment, Remo leverages Manticore for its HTTP requests, and until that is abstracted, this library is only compatible with JRuby.
 
