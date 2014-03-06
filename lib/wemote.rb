@@ -1,3 +1,4 @@
+require 'manticore'
 require_relative './wemote/version'
 
 module Wemote

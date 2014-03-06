@@ -1,6 +1,5 @@
 require 'socket'
 require 'ipaddr'
-require 'manticore'
 
 module Wemote
   class Switch
