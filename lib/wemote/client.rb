@@ -78,6 +78,8 @@ module Wemote
       extend Wemote::Client.technique
     end
 
+    private
+
     def _get(lib,url,body=nil,headers=nil)
       lib.get(url,{body:body,headers:headers})
     end
