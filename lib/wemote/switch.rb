@@ -50,6 +50,11 @@ EOF
 
         3.times { socket.send(DISCOVERY, 0, MULTICAST_ADDR, PORT) }
 
+        # The following is a bit silly, but is necessary for JRuby support,
+        # which seems to have some issues with socket interruption.
+        # If you have a working JRuby solution that doesn't require this
+        # kind of hackery, by all means, submit a pull request!
+
         sleep 1
 
         parser = Thread.start do
@@ -86,31 +91,30 @@ EOF
 
     def get_state
       response = begin
-        client.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Wemote::XML.get_binary_state, :headers => GET_HEADERS).call
+        client.post("http://#{@host}:#{@port}/upnp/control/basicevent1",Wemote::XML.get_binary_state,GET_HEADERS)
       rescue Exception
-        client.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Wemote::XML.get_binary_state, :headers => GET_HEADERS).call
+        client.post("http://#{@host}:#{@port}/upnp/control/basicevent1",Wemote::XML.get_binary_state,GET_HEADERS)
       end
       response.body.match(/<BinaryState>(\d)<\/BinaryState>/)[1] == '1' ? :on : :off
     end
 
     def set_state(state)
       begin
-        client.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Wemote::XML.set_binary_state(state), :headers => SET_HEADERS).call
+        client.post("http://#{@host}:#{@port}/upnp/control/basicevent1",Wemote::XML.set_binary_state(state),SET_HEADERS)
       rescue Exception
-        client.post("http://#{@host}:#{@port}/upnp/control/basicevent1",:body => Wemote::XML.set_binary_state(state), :headers => SET_HEADERS).call
+        client.post("http://#{@host}:#{@port}/upnp/control/basicevent1",Wemote::XML.set_binary_state(state),SET_HEADERS)
       end
     end
 
     private
 
     def client
-      @client ||= Manticore::Client.new
+      @client ||= Wemote::Client.new
     end
 
     def set_meta
-      client.get("http://#{@host}:#{@port}/setup.xml") do |response|
-        @name = response.body.match(/<friendlyName>([^<]+)<\/friendlyName>/)[1]
-      end
+      response = client.get("http://#{@host}:#{@port}/setup.xml")
+      @name = response.body.match(/<friendlyName>([^<]+)<\/friendlyName>/)[1]
     end
 
   end

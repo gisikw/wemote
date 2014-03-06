@@ -1,8 +1,9 @@
 source 'https://rubygems.org'
-
-# Specify your gem's dependencies in manticore.gemspec
 gemspec
 
-gem 'manticore', git: 'git://github.com/cheald/manticore.git'
+# Commented out until I can determine a way to set engine-specific dependencies
+# gem 'manticore', git: 'git://github.com/cheald/manticore.git'
+gem 'httparty'
+gem 'typhoeus'
 gem 'rspec'
 gem 'rake'

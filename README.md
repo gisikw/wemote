@@ -1,20 +1,20 @@
-# Wemote [![Build Status](https://travis-ci.org/gisikw/wemote.png)](https://travis-ci.org/gisikw/wemote) [![Gem Version](https://badge.fury.io/rb/wemote.png)](http://badge.fury.io/rb/wemote)
+# Wemote [![Build Status](https://travis-ci.org/gisikw/wemote.png)](https://travis-ci.org/gisikw/wemote) [![Gem Version](https://badge.fury.io/rb/wemote.png)](http://badge.fury.io/rb/wemote) [![Coverage Status](https://coveralls.io/repos/gisikw/wemote/badge.png)](https://coveralls.io/r/gisikw/wemote)
 
-Wemote is an interface for controlling WeMo light switches (and possibly outlets in the future). Unlike other implementations, it does not rely upon `playful` for upnp discovery, which makes it compatible with JRuby. For the moment, Wemote leverages Manticore for its HTTP requests, and until that is abstracted, this library is only compatible with JRuby.
+Wemote is an interface for controlling WeMo light switches (and possibly outlets in the future). Unlike other implementations, it does not rely upon `playful` for upnp discovery, which makes it compatible with alternative Ruby engines, such as JRuby.
 
 ## Installation
 
-First, clone the repository:
+Add this line to your application's Gemfile:
 
-    git clone https://github.com/gisikw/wemote.git
+    gem 'wemote'
 
 And then execute:
 
-    $ gem build wemote.gemspec
+    $ bundle
 
-Finally, run:
+Or install it yourself as:
 
-    $ gem install wemote-0.0.1.gem
+    $ gem install wemote
 
 ## Usage
 
@@ -32,13 +32,17 @@ switch = Wemote::Switch.find('Kitchen Switch') #=> #<Remo::Switch:0x27f33aef @ho
 
 Given a Switch instance, you can call the following methods:
 ```ruby
-switch.state #=> ["off","on"]
+switch.get_state #=> [:off,:on]
 switch.off? #=> [true,false]
 switch.on? #=> [true,false]
 switch.on!
 switch.off!
 switch.toggle!
 ```
+
+## Performance
+
+Wemote is designed to be performant - and as such, it will leverage the best HTTP library available for making requests. Currently, Wemote will use (in order of preference): `manticore`, `typhoeus`, `httparty`, and finally (miserably) `net/http`. Because you probably like things fast too, we recommend you `gem install manticore` on JRuby, or `gem install typhoeus` on another engine. In order to keep the gem as flexible as possible, none of these are direct dependencies. They just make Wemote happy and fast.
 
 ## Contributing
 
