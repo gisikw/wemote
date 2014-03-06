@@ -1,4 +1,4 @@
-# Wemote [![Build Status](https://img.shields.io/travis/gisikw/wemote/master.svg)](https://travis-ci.org/gisikw/wemote)[![Coverage Status](https://coveralls.io/repos/gisikw/wemote/badge.png)](https://coveralls.io/r/gisikw/wemote)
+# Wemote [![Build Status](https://travis-ci.org/gisikw/wemote.png)](https://travis-ci.org/gisikw/wemote)[![Coverage Status](https://coveralls.io/repos/gisikw/wemote/badge.png)](https://coveralls.io/r/gisikw/wemote)
 
 Wemote is an interface for controlling WeMo light switches (and possibly outlets in the future). Unlike other implementations, it does not rely upon `playful` for upnp discovery, which makes it compatible with JRuby. For the moment, Wemote leverages Manticore for its HTTP requests, and until that is abstracted, this library is only compatible with JRuby.
 
