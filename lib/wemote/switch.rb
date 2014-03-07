@@ -66,6 +66,7 @@ EOF
       end
 
       def listen(socket,switches)
+        sleep 1
         Thread.start do
           loop do
             message, _ = socket.recvfrom(1024)
@@ -87,11 +88,9 @@ EOF
         # a working JRuby solution that doesn't require this kind of hackery,
         # by all means, submit a pull request!
 
-        sleep 1
-
-        listener = listen(socket,switches).tap{|l|sleep 1; l.kill}
-
+        listen(socket,switches).tap{|l|sleep 1; l.kill}
         switches = switches.uniq.map{|s|self.new(*s)}
+
         if return_socket
           [switches,socket]
         else
