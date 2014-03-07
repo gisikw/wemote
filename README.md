@@ -32,7 +32,6 @@ switch = Wemote::Switch.find('Kitchen Switch') #=> #<Remo::Switch:0x27f33aef @ho
 
 Given a Switch instance, you can call the following methods:
 ```ruby
-switch.get_state #=> [:off,:on]
 switch.off? #=> [true,false]
 switch.on? #=> [true,false]
 switch.on!
