@@ -21,7 +21,7 @@ Or install it yourself as:
 You can fetch all lightswitches on your network (providing you've set them up with your smartphone), via:
 
 ```ruby
-switches = Wemote::Switch.all(force_reload=false) #=> [#<Remo::Switch:0x27f33aef @host="192.168.1.11", @name="Kitchen Switch", @port="49154">, #<Remo::Switch:0x51a23566 @host="192.168.1.12", @name="Main Room", @port="49154">]
+switches = Wemote::Switch.all #=> [#<Remo::Switch:0x27f33aef @host="192.168.1.11", @name="Kitchen Switch", @port="49154">
 ```
 
 Or select a switch by its friendly name:
