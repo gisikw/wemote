@@ -1,4 +1,4 @@
-# Wemote [![Build Status](https://travis-ci.org/gisikw/wemote.png)](https://travis-ci.org/gisikw/wemote) [![Gem Version](https://badge.fury.io/rb/wemote.png)](http://badge.fury.io/rb/wemote) [![Coverage Status](https://coveralls.io/repos/gisikw/wemote/badge.png)](https://coveralls.io/r/gisikw/wemote) [![Code Climate](https://codeclimate.com/github/gisikw/wemote.png)](https://codeclimate.com/github/gisikw/wemote)
+# Wemote [![Build Status](https://travis-ci.org/gisikw/wemote.png)](https://travis-ci.org/gisikw/wemote) [![Gem Version](https://badge.fury.io/rb/wemote.png)](http://badge.fury.io/rb/wemote) ![Code Climate](https://codeclimate.com/github/gisikw/wemote.png)](https://codeclimate.com/github/gisikw/wemote)
 
 Wemote is an interface for controlling WeMo light switches (and possibly outlets in the future). Unlike other implementations, it does not rely upon `playful` for upnp discovery, which makes it compatible with alternative Ruby engines, such as JRuby.
 
