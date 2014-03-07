@@ -72,22 +72,5 @@ describe Wemote::Switch do
       end
     end
 
-    describe 'get_state' do
-      it 'should return the binary state of the switch' do
-
-        @switch.client.stub(:post).and_return(double('response',body:'<BinaryState>1</BinaryState>'))
-        @switch.get_state.should == :on
-        @switch.client.stub(:post).and_return(double('response',body:'<BinaryState>0</BinaryState>'))
-        @switch.get_state.should == :off
-      end
-    end
-
-    describe 'set_state' do
-      it 'should set the binary state of the switch' do
-        @switch.client.stub(:post).and_return(double('response',body:'Called'))
-        @switch.set_state(1).body.should == 'Called'
-      end
-    end
-
   end
 end

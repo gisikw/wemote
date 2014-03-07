@@ -14,7 +14,7 @@ module Wemote
         #   Calls {Wemote::Switch#$1} on all containing elements and return the results in an
         #   array
         #   @return [Array]
-        def self.make(name)
+        def make(name)
           define_method(name){map{|s|s.send(name)}}
         end
 
