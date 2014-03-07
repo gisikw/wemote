@@ -26,22 +26,30 @@ EOF
     }
 
     class << self
+      # Returns all Switches detected on the local network
+      #
+      # @param [Boolean] refresh Refresh and redetect Switches
+      # @return [Array] all Switches on the network
       def all(refresh=false)
         @switches = nil if refresh
         @switches ||= fetch_switches
       end
 
+      # Returns a Switch of a given name
+      #
+      # @param  [String] name the friendly name of the Switch
+      # @return [Wemote::Switch] a Switch object
       def find(name)
         all.detect{|s|s.name == name}
       end
+
+      private
 
       def discover(socket = nil)
         @switches = nil
         @switches, socket = fetch_switches(true,socket)
         socket
       end
-
-      private
 
       def ssdp_socket
         socket = UDPSocket.new

@@ -1,22 +1,23 @@
 module Wemote
   module XML
     class << self
-      TEMPLATES = {}
+      xml_path = File.join(File.dirname(__FILE__),'/../../xml')
+      TEMPLATES = {
+        get_binary_state: File.read(File.join(xml_path,'get_binary_state.xml')),
+        set_binary_state: File.read(File.join(xml_path,'set_binary_state.xml'))
+      }
 
-      Dir.glob(File.join(File.dirname(__FILE__),'/../../xml/*.xml')).each do |file|
-        basename = File.basename(file,'.xml')
-        TEMPLATES[basename] = File.read(file)
-
-        define_method basename do |*args|
-          t = TEMPLATES[basename].dup
-          if (replace = t.scan(/{{\d+}}/).size) != args.size
-            raise ArgumentError, "wrong number of arguments calling `#{basename}` (#{args.size} for #{replace})"
-          end
-          (1..replace).map{|i|t.gsub!("{{#{i}}}",args[i-1].to_s)}
-          t
-        end
-
+      # @return [String] The required XML body for a Wemo binary state request
+      def get_binary_state
+        TEMPLATES[:get_binary_state]
       end
+
+      # @param [Integer] state Either 1 or 0, for off and on respectively
+      # @return [String] The required XML body for a Wemo binary state set request
+      def set_binary_state(state)
+        TEMPLATES[:set_binary_state].gsub("{{1}}",state.to_s)
+      end
+
     end
   end
 end
