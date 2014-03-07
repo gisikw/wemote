@@ -35,6 +35,12 @@ EOF
         all.detect{|s|s.name == name}
       end
 
+      def discover(socket = nil)
+        @switches = nil
+        @switches, socket = fetch_switches(true,socket)
+        socket
+      end
+
       private
 
       def ssdp_socket
@@ -46,8 +52,8 @@ EOF
         socket
       end
 
-      def fetch_switches
-        socket = ssdp_socket
+      def fetch_switches(return_socket=false,socket=nil)
+        socket ||= ssdp_socket
         switches = []
 
         3.times { socket.send(DISCOVERY, 0, MULTICAST_ADDR, PORT) }
@@ -71,10 +77,12 @@ EOF
         sleep 1
         parser.kill
 
-        socket.close
-
-        return switches.uniq.map{|s|self.new(*s)}
-
+        if return_socket
+          [switches.uniq.map{|s|self.new(*s)},socket]
+        else
+          socket.close
+          switches.uniq.map{|s|self.new(*s)}
+        end
       end
     end
 
@@ -90,6 +98,22 @@ EOF
     def off?;     get_state == :off;  end
     def on!;      set_state(1);       end
     def on?;      get_state == :on;   end
+
+    def poll(rate=0.25,async=true)
+      old_state = get_state
+      poller = Thread.start do
+        loop do
+          state = get_state
+          if state != old_state
+            old_state = state
+            yield state
+          end
+          sleep rate
+        end
+      end
+      puts "Monitoring #{@name} for changes"
+      async ? poller : poller.join
+    end
 
     def get_state
       response = begin
