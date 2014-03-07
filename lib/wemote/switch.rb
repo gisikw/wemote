@@ -89,16 +89,14 @@ EOF
 
         sleep 1
 
-        listener = listen(socket,switches)
+        listener = listen(socket,switches).tap{|l|sleep 1; l.kill}
 
-        sleep 1
-        listener.kill
-
+        switches = switches.uniq.map{|s|self.new(*s)}
         if return_socket
-          [switches.uniq.map{|s|self.new(*s)},socket]
+          [switches,socket]
         else
           socket.close
-          switches.uniq.map{|s|self.new(*s)}
+          switches
         end
       end
     end
