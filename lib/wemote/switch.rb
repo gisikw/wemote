@@ -65,6 +65,17 @@ EOF
         socket
       end
 
+      def listen(socket,switches)
+        Thread.start do
+          loop do
+            message, _ = socket.recvfrom(1024)
+            if message.match(/LOCATION.*Belkin/m)
+              switches << message.match(/LOCATION:\s+http:\/\/([^\/]+)/)[1].split(':')
+            end
+          end
+        end
+      end
+
       def fetch_switches(return_socket=false,socket=nil)
         socket ||= ssdp_socket
         switches = []
@@ -78,17 +89,10 @@ EOF
 
         sleep 1
 
-        parser = Thread.start do
-          loop do
-            message, _ = socket.recvfrom(1024)
-            if message.match(/LOCATION.*Belkin/m)
-              switches << message.match(/LOCATION:\s+http:\/\/([^\/]+)/)[1].split(':')
-            end
-          end
-        end
+        listener = listen(socket,switches)
 
         sleep 1
-        parser.kill
+        listener.kill
 
         if return_socket
           [switches.uniq.map{|s|self.new(*s)},socket]
