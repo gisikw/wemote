@@ -21,13 +21,13 @@ Or install it yourself as:
 You can fetch all lightswitches on your network (providing you've set them up with your smartphone), via:
 
 ```ruby
-switches = Wemote::Switch.all #=> [#<Remo::Switch:0x27f33aef @host="192.168.1.11", @name="Kitchen Switch", @port="49154">
+switches = Wemote::Switch.all #=> [#<Wemote::Switch:0x27f33aef @host="192.168.1.11", @name="Kitchen Switch", @port="49154">
 ```
 
 Or select a switch by its friendly name:
 
 ```ruby
-switch = Wemote::Switch.find('Kitchen Switch') #=> #<Remo::Switch:0x27f33aef @host="192.168.1.11", @name="Kitchen Switch", @port="49154">
+switch = Wemote::Switch.find('Kitchen Switch') #=> #<Wemote::Switch:0x27f33aef @host="192.168.1.11", @name="Kitchen Switch", @port="49154">
 ```
 
 Given a Switch instance, you can call the following methods:
@@ -41,7 +41,7 @@ switch.toggle!
 
 ## Performance
 
-Wemote is designed to be performant - and as such, it will leverage the best HTTP library available for making requests. Currently, Wemote will use (in order of preference): `manticore`, `typhoeus`, `httparty`, and finally (miserably) `net/http`. Because you probably like things fast too, we recommend you `gem install manticore` on JRuby, or `gem install typhoeus` on another engine. In order to keep the gem as flexible as possible, none of these are direct dependencies. They just make Wemote happy and fast.
+Wemote is designed to be performant - and as such, it will leverage the best HTTP library available for making requests. Currently, Wemote will use (in order of preference): `manticore`, `typhoeus`, and finally (miserably) `net/http`. Because you probably like things fast too, we recommend you `gem install manticore` on JRuby, or `gem install typhoeus` on another engine. In order to keep the gem as flexible as possible, none of these are direct dependencies. They just make Wemote happy and fast.
 
 ## Contributing
 

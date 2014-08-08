@@ -1,5 +1,6 @@
 require 'socket'
 require 'ipaddr'
+require 'timeout'
 
 module Wemote
 
@@ -8,17 +9,6 @@ module Wemote
   # convenience. Finally, it provides the {#poll} method, which accepts a block
   # to be executed any time the switch changes state.
   class Switch
-    MULTICAST_ADDR = '239.255.255.250'
-    BIND_ADDR = '0.0.0.0'
-    PORT = 1900
-    DISCOVERY= <<-EOF
-M-SEARCH * HTTP/1.1\r
-HOST: 239.255.255.250:1900\r
-MAN: "ssdp:discover"\r
-MX: 10\r
-ST: urn:Belkin:device:lightswitch:1\r
-\r
-EOF
 
     GET_HEADERS = {
       "SOAPACTION"   => '"urn:Belkin:service:basicevent:1#GetBinaryState"',
@@ -37,7 +27,7 @@ EOF
       # @return [Array] all Switches on the network
       def all(refresh=false)
         @switches = nil if refresh
-        @switches ||= Wemote::Collection::Switch.new(fetch_switches)
+        @switches ||= Wemote::Collection::Switch.new(discover)
       end
 
       # Returns a Switch of a given name
@@ -50,59 +40,16 @@ EOF
 
       private
 
-      def discover(socket = nil)
-        @switches = nil
-        @switches, socket = fetch_switches(true,socket)
-        socket
-      end
-
-      def ssdp_socket
-        socket = UDPSocket.new
-        socket.setsockopt(Socket::IPPROTO_IP, Socket::IP_ADD_MEMBERSHIP, IPAddr.new(MULTICAST_ADDR).hton + IPAddr.new(BIND_ADDR).hton)
-        socket.setsockopt(Socket::IPPROTO_IP, Socket::IP_MULTICAST_TTL, 1)
-        socket.setsockopt(Socket::SOL_SOCKET, Socket::SO_REUSEPORT, 1)
-        socket.bind(BIND_ADDR,PORT)
-        socket
-      end
-
-      def listen(socket,switches)
-        sleep 1
-        Thread.start do
-          loop do
-            message, _ = socket.recvfrom(1024)
-            if message.match(/LOCATION.*Belkin/m)
-              switches << message.match(/LOCATION:\s+http:\/\/([^\/]+)/)[1].split(':')
-            end
-          end
-        end
-      end
-
-      def fetch_switches(return_socket=false,socket=nil)
-        socket ||= ssdp_socket
-        switches = []
-
-        3.times { socket.send(DISCOVERY, 0, MULTICAST_ADDR, PORT) }
-
-        # The following is a bit silly, but is necessary for JRuby support,
-        # which seems to have some issues with socket interruption. If you have
-        # a working JRuby solution that doesn't require this kind of hackery,
-        # by all means, submit a pull request!
-
-        listen(socket,switches).tap{|l|sleep 1; l.kill}
-        switches.uniq!.map!{|s|self.new(*s)}
-
-        if return_socket
-          [switches,socket]
-        else
-          socket.close
-          switches
-        end
+      def discover(broadcast = '255.255.255.255')
+        `ping -t 1 #{broadcast} > /dev/null && arp -na | grep b4:75`.split("\n").map do |device|
+          self.new(/\((\d+\.\d+\.\d+\.\d+)\)/.match(device)[1])
+        end.reject{|device| device.instance_variable_get(:@port).nil? }
       end
     end
 
     attr_accessor :name
 
-    def initialize(host,port)
+    def initialize(host,port=nil)
       @host, @port = host, port
       set_meta
     end
@@ -146,10 +93,13 @@ EOF
       old_state = get_state
       poller = Thread.start do
         loop do
-          state = get_state
-          if state != old_state
-            old_state = state
-            yield state
+          begin
+            state = get_state
+            if state != old_state
+              old_state = state
+              yield state
+            end
+          rescue Exception
           end
           sleep rate
         end
@@ -182,8 +132,21 @@ EOF
     end
 
     def set_meta
-      response = client.get("http://#{@host}:#{@port}/setup.xml")
-      @name = response.body.match(/<friendlyName>([^<]+)<\/friendlyName>/)[1]
+      if @port
+        response = client.get("http://#{@host}:#{@port}/setup.xml")
+        @name = response.body.match(/<friendlyName>([^<]+)<\/friendlyName>/)[1]
+      else
+        for port in 49152..49156
+          begin
+            response = nil
+            Timeout::timeout(1){ response = client.get("http://#{@host}:#{port}/setup.xml") }
+            @name = response.body.match(/<friendlyName>([^<]+)<\/friendlyName>/)[1]
+            @port = port
+            break
+          rescue Exception
+          end
+        end
+      end
     end
 
   end

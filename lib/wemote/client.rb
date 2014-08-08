@@ -41,13 +41,15 @@ module Wemote
       end
     end
 
-    module HTTParty
-      DEPENDENCIES = ['httparty']
-      def self.extended(base)
-        base.instance_variable_set(:@lib,::HTTParty)
-        base.extend(SmartLib)
-      end
-    end
+    # HTTParty is temporarily disabled, as it's auto-parsing the XML
+
+    #module HTTParty
+    #  DEPENDENCIES = ['httparty']
+    #  def self.extended(base)
+    #    base.instance_variable_set(:@lib,::HTTParty)
+    #    base.extend(SmartLib)
+    #  end
+    #end
 
     module NetHTTP
       DEPENDENCIES = ['net/http','uri']
