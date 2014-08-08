@@ -10,6 +10,8 @@ module Wemote
   # to be executed any time the switch changes state.
   class Switch
 
+    GOOGLE_IP = "64.233.187.99"
+
     GET_HEADERS = {
       "SOAPACTION"   => '"urn:Belkin:service:basicevent:1#GetBinaryState"',
       "Content-type" => 'text/xml; charset="utf-8"'
@@ -40,8 +42,9 @@ module Wemote
 
       private
 
-      def discover(broadcast = '255.255.255.255')
-        `ping -t 1 #{broadcast} > /dev/null && arp -na | grep b4:75`.split("\n").map do |device|
+      def discover
+        ip = UDPSocket.open {|s| s.connect(GOOGLE_IP, 1); s.addr.last}
+        `nmap -sP #{ip.split('.')[0..-2].join('.')}.* > /dev/null && arp -na | grep b4:75`.split("\n").map do |device|
           self.new(/\((\d+\.\d+\.\d+\.\d+)\)/.match(device)[1])
         end.reject{|device| device.instance_variable_get(:@port).nil? }
       end

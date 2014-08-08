@@ -8,8 +8,8 @@ module Wemote
 
   class << self
 
-    def discover(broadcast='255.255.255.255')
-      Wemote::Switch.send(:discover,broadcast)
+    def discover
+      Wemote::Switch.send(:discover)
     end
 
   end
