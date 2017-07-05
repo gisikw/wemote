@@ -12,6 +12,21 @@ module Wemote
 
     GOOGLE_IP = "64.233.187.99"
 
+    BELKIN_MAC = %w(
+      00:17:3f
+      00:1c:df
+      00:22:75
+      08:86:3b
+      14:91:82
+      58:ef:68
+      60:38:e0
+      94:10:3e
+      94:44:52
+      b4:75:0e
+      c0:56:27
+      eC:1a:59
+    )
+
     GET_HEADERS = {
       "SOAPACTION"   => '"urn:Belkin:service:basicevent:1#GetBinaryState"',
       "Content-type" => 'text/xml; charset="utf-8"'
@@ -44,8 +59,10 @@ module Wemote
 
       def discover
         ip = UDPSocket.open {|s| s.connect(GOOGLE_IP, 1); s.addr.last}
-        `nmap -sP #{ip.split('.')[0..-2].join('.')}.* > /dev/null && arp -na | grep b4:75`.split("\n").map do |device|
-          self.new(/\((\d+\.\d+\.\d+\.\d+)\)/.match(device)[1])
+        `nmap -sP #{ip.split('.')[0..-2].join('.')}.* > /dev/null && arp -na`.
+          split("\n").
+          select{|l| BELKIN_MAC.any?{|m| l.include?("at #{m}")}}.map do |device|
+            self.new(/\((\d+\.\d+\.\d+\.\d+)\)/.match(device)[1])
         end.reject{|device| device.instance_variable_get(:@port).nil? }
       end
     end
