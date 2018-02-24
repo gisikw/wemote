@@ -58,6 +58,7 @@ module Wemote
 
     def initialize(host,port=nil)
       @host, @port = host, port
+      set_meta
     end
 
     def device_type 
@@ -151,5 +152,9 @@ module Wemote
       @client ||= Wemote::Client.new
     end
 
+    def set_meta
+      response = client.get("http://#{@host}:#{@port}/setup.xml")
+      @name = response.body.match(/<friendlyName>([^<]+)<\/friendlyName>/)[1]
+    end
   end
 end
