@@ -1,6 +1,7 @@
 require 'socket'
 require 'ipaddr'
 require 'timeout'
+require 'ssdp'
 
 module Wemote
 
@@ -32,10 +33,6 @@ module Wemote
 
     end
 
-    def initialize(host,port=nil)
-      super(host, port)
-    end
-
     # Turn the Insight on or off, based on its current state
     def toggle!  
       on? or standby? ? off! : on!;   
@@ -52,15 +49,18 @@ module Wemote
       get_insight_params()[:power]
     end
 
+    def energy
+      get_insight_params()[:energy]
+    end
+
+    def on_today
+      get_insight_params()[:on_today]
+    end
+
     private
 
     def get_state
-      response = begin
-        client.post("http://#{@host}:#{@port}/upnp/control/basicevent1",Wemote::XML.get_binary_state,GET_HEADERS)
-      rescue Exception
-        client.post("http://#{@host}:#{@port}/upnp/control/basicevent1",Wemote::XML.get_binary_state,GET_HEADERS)
-      end
-      case response.body.match(/<BinaryState>(\d)<\/BinaryState>/)[1]
+      case get_binary_state()
         when '0'
           :off
         when '1'

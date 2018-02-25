@@ -1,6 +1,7 @@
 require 'socket'
 require 'ipaddr'
 require 'timeout'
+require 'ssdp'
 
 module Wemote
 
@@ -132,12 +133,16 @@ module Wemote
     protected
 
     def get_state
+      self.get_binary_state() == '1' ? :on : :off
+    end
+
+    def get_binary_state
       response = begin
         client.post("http://#{@host}:#{@port}/upnp/control/basicevent1",Wemote::XML.get_binary_state,GET_HEADERS)
       rescue Exception
         client.post("http://#{@host}:#{@port}/upnp/control/basicevent1",Wemote::XML.get_binary_state,GET_HEADERS)
       end
-      response.body.match(/<BinaryState>(\d)<\/BinaryState>/)[1] == '1' ? :on : :off
+      response.body.match(/<BinaryState>(\d)<\/BinaryState>/)[1]
     end
 
     def set_state(state)
