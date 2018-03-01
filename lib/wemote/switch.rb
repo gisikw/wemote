@@ -1,6 +1,7 @@
 require 'socket'
 require 'ipaddr'
 require 'timeout'
+require 'ssdp'
 
 module Wemote
 
@@ -9,8 +10,6 @@ module Wemote
   # convenience. Finally, it provides the {#poll} method, which accepts a block
   # to be executed any time the switch changes state.
   class Switch
-
-    GOOGLE_IP = "64.233.187.99"
 
     GET_HEADERS = {
       "SOAPACTION"   => '"urn:Belkin:service:basicevent:1#GetBinaryState"',
@@ -23,6 +22,11 @@ module Wemote
     }
 
     class << self
+
+      def device_type
+        'urn:Belkin:device:controllee:1'
+      end
+
       # Returns all Switches detected on the local network
       #
       # @param [Boolean] refresh Refresh and redetect Switches
@@ -40,14 +44,15 @@ module Wemote
         all.detect{|s|s.name == name}
       end
 
-      private
+      protected
 
       def discover
-        ip = UDPSocket.open {|s| s.connect(GOOGLE_IP, 1); s.addr.last}
-        `nmap -sP #{ip.split('.')[0..-2].join('.')}.* > /dev/null && arp -na | grep b4:75`.split("\n").map do |device|
-          self.new(/\((\d+\.\d+\.\d+\.\d+)\)/.match(device)[1])
-        end.reject{|device| device.instance_variable_get(:@port).nil? }
+        finder = SSDP::Consumer.new timeout: 3, first_only: false
+        finder.search(service: self.device_type).map do |device|
+          self.new(device[:address], device[:params]['LOCATION'].match(/:([0-9]{1,5})\//)[1])
+        end
       end
+
     end
 
     attr_accessor :name
@@ -57,24 +62,38 @@ module Wemote
       set_meta
     end
 
+    def device_type 
+      'urn:Belkin:device:controllee:1'
+    end
+
     # Turn the Switch on or off, based on its current state
-    def toggle!;  on? ? off! : on!;   end
+    def toggle!
+        on? ? off! : on!
+    end
 
     # Turn the Switch off
-    def off!;     set_state(0);       end
+    def off!     
+      set_state(0)       
+    end
 
     # Turn the Switch on
-    def on!;      set_state(1);       end
+    def on!      
+      set_state(1)   
+    end
 
     # Return whether the Switch is off
     #
     # @return [Boolean]
-    def off?;     get_state == :off;  end
+    def off?     
+      get_state == :off
+    end
 
     # Return whether the Switch is on
     #
     # @return [Boolean]
-    def on?;      get_state == :on;   end
+    def on?      
+      get_state == :on
+    end
 
     # Monitors the state of the Switch via polling, and yields to the block
     # given with the updated state.
@@ -111,15 +130,19 @@ module Wemote
       async ? poller : poller.join
     end
 
-    private
+    protected
 
     def get_state
+      self.get_binary_state() == '1' ? :on : :off
+    end
+
+    def get_binary_state
       response = begin
         client.post("http://#{@host}:#{@port}/upnp/control/basicevent1",Wemote::XML.get_binary_state,GET_HEADERS)
       rescue Exception
         client.post("http://#{@host}:#{@port}/upnp/control/basicevent1",Wemote::XML.get_binary_state,GET_HEADERS)
       end
-      response.body.match(/<BinaryState>(\d)<\/BinaryState>/)[1] == '1' ? :on : :off
+      response.body.match(/<BinaryState>(\d)<\/BinaryState>/)[1]
     end
 
     def set_state(state)
@@ -135,22 +158,8 @@ module Wemote
     end
 
     def set_meta
-      if @port
-        response = client.get("http://#{@host}:#{@port}/setup.xml")
-        @name = response.body.match(/<friendlyName>([^<]+)<\/friendlyName>/)[1]
-      else
-        for port in 49152..49156
-          begin
-            response = nil
-            Timeout::timeout(1){ response = client.get("http://#{@host}:#{port}/setup.xml") }
-            @name = response.body.match(/<friendlyName>([^<]+)<\/friendlyName>/)[1]
-            @port = port
-            break
-          rescue Exception
-          end
-        end
-      end
+      response = client.get("http://#{@host}:#{@port}/setup.xml")
+      @name = response.body.match(/<friendlyName>([^<]+)<\/friendlyName>/)[1]
     end
-
   end
 end

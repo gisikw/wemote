@@ -4,7 +4,8 @@ module Wemote
       xml_path = File.join(File.dirname(__FILE__),'/../../xml')
       TEMPLATES = {
         get_binary_state: File.read(File.join(xml_path,'get_binary_state.xml')),
-        set_binary_state: File.read(File.join(xml_path,'set_binary_state.xml'))
+        set_binary_state: File.read(File.join(xml_path,'set_binary_state.xml')),
+        get_insight_params: File.read(File.join(xml_path,'get_insight_params.xml'))
       }
 
       # @return [String] The required XML body for a Wemo binary state request
@@ -17,6 +18,11 @@ module Wemote
       def set_binary_state(state)
         TEMPLATES[:set_binary_state].gsub("{{1}}",state.to_s)
       end
+
+      def get_insight_params
+        TEMPLATES[:get_insight_params]
+      end
+
 
     end
   end
